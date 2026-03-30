@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Store</title>
+<title>Pro Store</title>
 
 <style>
 body{
@@ -13,28 +13,53 @@ body{
 
 /* HEADER */
 header{
-  background:#2874f0;
+  background:#131921;
   color:white;
   padding:10px;
   display:flex;
-  justify-content:space-between;
   align-items:center;
+  justify-content:space-between;
+}
+
+header h2{
+  margin:0;
+  color:#ff9900;
 }
 
 header input{
-  width:45%;
+  width:50%;
   padding:8px;
-  border:none;
   border-radius:5px;
+  border:none;
 }
 
-/* BUTTONS */
-.btn{
+/* CATEGORY BAR */
+.categories{
+  display:flex;
+  overflow-x:auto;
   background:white;
-  color:#2874f0;
-  border:none;
-  padding:6px;
-  border-radius:5px;
+  padding:10px;
+}
+
+.cat{
+  min-width:100px;
+  background:#2874f0;
+  color:white;
+  margin-right:10px;
+  padding:8px;
+  text-align:center;
+  border-radius:20px;
+  font-size:12px;
+}
+
+/* BANNER */
+.banner{
+  margin:10px;
+  background:linear-gradient(90deg,#2874f0,#00c6ff);
+  color:white;
+  padding:20px;
+  border-radius:10px;
+  text-align:center;
 }
 
 /* PRODUCTS */
@@ -47,13 +72,18 @@ header input{
 
 .card{
   background:white;
-  padding:10px;
   border-radius:10px;
+  padding:10px;
+  transition:0.3s;
 }
 
 .card img{
   width:100%;
   border-radius:10px;
+}
+
+.card:hover{
+  transform:scale(1.03);
 }
 
 .price{
@@ -66,16 +96,27 @@ button{
   padding:8px;
   margin-top:5px;
   border:none;
-  background:#2874f0;
-  color:white;
   border-radius:5px;
+  cursor:pointer;
 }
 
-/* ADMIN PANEL */
-#adminPanel{
-  display:none;
-  padding:10px;
-  background:white;
+.add{
+  background:#2874f0;
+  color:white;
+}
+
+.wish{
+  background:#ff4081;
+  color:white;
+}
+
+/* CART BUTTON */
+.topbtn{
+  background:#ff9900;
+  border:none;
+  padding:8px;
+  border-radius:5px;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -83,41 +124,42 @@ button{
 <body>
 
 <header>
-  <h3>My Store</h3>
+  <h2>MyStore</h2>
 
-  <input id="searchBox" onkeyup="searchProduct()" placeholder="Search...">
+  <input id="searchBox" onkeyup="search()" placeholder="Search products...">
 
-  <button class="btn" onclick="viewCart()">🛒</button>
-  <button class="btn" onclick="viewWishlist()">❤️</button>
-  <button class="btn" onclick="toggleAdmin()">Admin</button>
+  <button class="topbtn" onclick="viewCart()">🛒</button>
 </header>
 
-<!-- ADMIN PANEL -->
-<div id="adminPanel">
-  <h3>Add Product</h3>
-  <input id="pname" placeholder="Name"><br>
-  <input id="pprice" placeholder="Price"><br>
-  <input id="pimg" placeholder="Image URL"><br>
-  <button onclick="addProduct()">Add</button>
+<!-- CATEGORY -->
+<div class="categories">
+  <div class="cat">Mobiles</div>
+  <div class="cat">Fashion</div>
+  <div class="cat">Electronics</div>
+  <div class="cat">Home</div>
+  <div class="cat">Beauty</div>
+</div>
+
+<!-- BANNER -->
+<div class="banner">
+  🔥 Big Sale Today - Up to 70% OFF 🔥
 </div>
 
 <!-- PRODUCTS -->
-<div class="products" id="productList"></div>
+<div class="products" id="list"></div>
 
 <script>
 
 let cart = [];
-let wishlist = [];
 
-/* DEFAULT PRODUCTS */
 let products = [
-  {name:"Smart Watch", price:999, img:"https://picsum.photos/200?1"},
-  {name:"Headphones", price:1299, img:"https://picsum.photos/200?2"},
-  {name:"Mobile Phone", price:9999, img:"https://picsum.photos/200?3"}
+  {name:"iPhone", price:69999, img:"https://picsum.photos/200?1"},
+  {name:"Shoes", price:1999, img:"https://picsum.photos/200?2"},
+  {name:"Headphones", price:999, img:"https://picsum.photos/200?3"},
+  {name:"Watch", price:2999, img:"https://picsum.photos/200?4"}
 ];
 
-/* SHOW PRODUCTS */
-function showProducts(){
+function show(){
   let html = "";
 
   products.forEach((p,i)=>{
@@ -127,16 +169,15 @@ function showProducts(){
       <h4>${p.name}</h4>
       <p class="price">₹${p.price}</p>
 
-      <button onclick="addCart(${i})">Add to Cart</button>
-      <button onclick="addWish(${i})">❤️ Wishlist</button>
+      <button class="add" onclick="add(${i})">Add to Cart</button>
+      <button class="wish" onclick="wish('${p.name}')">❤️ Wishlist</button>
     </div>`;
   });
 
-  document.getElementById("productList").innerHTML = html;
+  document.getElementById("list").innerHTML = html;
 }
 
-/* CART */
-function addCart(i){
+function add(i){
   cart.push(products[i]);
   alert("Added to cart 🛒");
 }
@@ -150,8 +191,8 @@ function viewCart(){
   let total = 0;
   let msg = "🛒 CART\n\n";
 
-  cart.forEach((p,i)=>{
-    msg += (i+1)+". "+p.name+" - ₹"+p.price+"\n";
+  cart.forEach((p)=>{
+    msg += p.name+" - ₹"+p.price+"\n";
     total += p.price;
   });
 
@@ -159,18 +200,11 @@ function viewCart(){
   alert(msg);
 }
 
-/* WISHLIST */
-function addWish(i){
-  wishlist.push(products[i].name);
-  alert("Added ❤️");
+function wish(name){
+  alert(name + " added to wishlist ❤️");
 }
 
-function viewWishlist(){
-  alert("❤️ Wishlist:\n\n"+wishlist.join("\n"));
-}
-
-/* SEARCH */
-function searchProduct(){
+function search(){
   let val = document.getElementById("searchBox").value.toLowerCase();
   let cards = document.getElementsByClassName("card");
 
@@ -180,26 +214,9 @@ function searchProduct(){
   }
 }
 
-/* ADMIN */
-function toggleAdmin(){
-  let a = document.getElementById("adminPanel");
-  a.style.display = (a.style.display=="block") ? "none" : "block";
-}
-
-function addProduct(){
-  let name = document.getElementById("pname").value;
-  let price = document.getElementById("pprice").value;
-  let img = document.getElementById("pimg").value;
-
-  products.push({name,price,img});
-  showProducts();
-
-  alert("Product added");
-}
-
-showProducts();
+show();
 
 </script>
 
 </body>
-</html>
+</html>>
