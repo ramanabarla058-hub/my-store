@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Pro Store</title>
+
+<style>
+body {
+    margin:0;
+    font-family: Arial;
+    background:#f2f2f2;
+}
+
+header {
+    background:#131921;
+    color:white;
+    padding:15px;
+    text-align:center;
+    font-size:20px;
+}
+
+.container {
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    padding:10px;
+}
+
+.card {
+    background:white;
+    width:160px;
+    margin:10px;
+    border-radius:10px;
+    box-shadow:0 2px 5px rgba(0,0,0,0.2);
+    padding:10px;
+    text-align:center;
+}
+
+.card img {
+    width:100%;
+    border-radius:10px;
+}
+
+.price {
+    color:green;
+    font-weight:bold;
+}
+
+button {
+    background:#ff9900;
+    border:none;
+    padding:8px;
+    width:100%;
+    border-radius:5px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+button:hover {
+    background:#e68a00;
+}
+
+.cart {
+    position:fixed;
+    right:0;
+    top:0;
+    width:220px;
+    height:100%;
+    background:#222;
+    color:white;
+    padding:10px;
+    overflow:auto;
+}
+
+.cart h3 {
+    text-align:center;
+}
+
+.cart-item {
+    font-size:13px;
+    margin:5px 0;
+}
+</style>
+</head>
+
+<body>
+
+<header>🛒 My Amazon Style Store</header>
+
+<div class="container">
+
+<div class="card">
+<img src="https://picsum.photos/200?1">
+<h4>LED Lights</h4>
+<p class="price">₹799</p>
+<button onclick="add('LED Lights',799)">Add to Cart</button>
+</div>
+
+<div class="card">
+<img src="https://picsum.photos/200?2">
+<h4>Smart Watch</h4>
+<p class="price">₹1499</p>
+<button onclick="add('Smart Watch',1499)">Add to Cart</button>
+</div>
+
+<div class="card">
+<img src="https://picsum.photos/200?3">
+<h4>Bluetooth Speaker</h4>
+<p class="price">₹999</p>
+<button onclick="add('Speaker',999)">Add to Cart</button>
+</div>
+
+<div class="card">
+<img src="https://picsum.photos/200?4">
+<h4>Headphones</h4>
+<p class="price">₹1299</p>
+<button onclick="add('Headphones',1299)">Add to Cart</button>
+</div>
+
+</div>
+
+<div class="cart">
+<h3>🛒 Cart</h3>
+<div id="items"></div>
+<h4>Total: ₹<span id="total">0</span></h4>
+<button onclick="checkout()">Checkout</button>
+</div>
+
+<script>
+let cart = [];
+let total = 0;
+
+function add(name, price){
+    cart.push({name,price});
+    total += price;
+    update();
+}
+
+function update(){
+    let box = document.getElementById("items");
+    box.innerHTML = "";
+
+    cart.forEach(i=>{
+        box.innerHTML += "<div class='cart-item'>"+i.name+" - ₹"+i.price+"</div>";
+    });
+
+    document.getElementById("total").innerText = total;
+}
+
+function checkout(){
+    if(cart.length == 0){
+        alert("Cart empty!");
+    } else {
+        alert("Order placed successfully 🎉");
+        cart = [];
+        total = 0;
+        update();
+    }
+}
+</script>
+
+</body>
+</html>
