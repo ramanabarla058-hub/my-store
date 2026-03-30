@@ -2,43 +2,43 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GreenKart Pro</title>
+<title>My Store</title>
 
 <style>
 body{
   margin:0;
   font-family:Arial;
-  background:#f3fff6;
+  background:#f1f3f6;
 }
 
 /* HEADER */
 header{
-  background:#1dbf73;
+  background:#2874f0;
   color:white;
-  padding:12px;
-  text-align:center;
-  font-size:20px;
-  font-weight:bold;
-  position:sticky;
-  top:0;
+  padding:10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 
-/* SEARCH */
-.search{
-  padding:10px;
-  text-align:center;
+header input{
+  width:45%;
+  padding:8px;
+  border:none;
+  border-radius:5px;
+}
+
+/* BUTTONS */
+.btn{
   background:white;
-}
-
-.search input{
-  width:90%;
-  padding:10px;
-  border:2px solid #1dbf73;
-  border-radius:25px;
+  color:#2874f0;
+  border:none;
+  padding:6px;
+  border-radius:5px;
 }
 
 /* PRODUCTS */
-.container{
+.products{
   display:grid;
   grid-template-columns:repeat(2,1fr);
   gap:10px;
@@ -47,43 +47,35 @@ header{
 
 .card{
   background:white;
+  padding:10px;
   border-radius:10px;
-  overflow:hidden;
-  box-shadow:0 2px 8px rgba(0,0,0,0.1);
 }
 
 .card img{
   width:100%;
-}
-
-.card h3{
-  margin:5px;
+  border-radius:10px;
 }
 
 .price{
-  color:#1dbf73;
+  color:green;
   font-weight:bold;
-  margin:5px;
 }
 
-.card button{
+button{
   width:100%;
   padding:8px;
+  margin-top:5px;
   border:none;
-  background:#1dbf73;
+  background:#2874f0;
   color:white;
-  font-size:14px;
+  border-radius:5px;
 }
 
-/* CART */
-.cart{
-  position:fixed;
-  right:10px;
-  bottom:10px;
-  background:#1dbf73;
-  color:white;
-  padding:10px 15px;
-  border-radius:50px;
+/* ADMIN PANEL */
+#adminPanel{
+  display:none;
+  padding:10px;
+  background:white;
 }
 </style>
 </head>
@@ -91,61 +83,121 @@ header{
 <body>
 
 <header>
-🛍️ GreenKart Ultra Pro
+  <h3>My Store</h3>
+
+  <input id="searchBox" onkeyup="searchProduct()" placeholder="Search...">
+
+  <button class="btn" onclick="viewCart()">🛒</button>
+  <button class="btn" onclick="viewWishlist()">❤️</button>
+  <button class="btn" onclick="toggleAdmin()">Admin</button>
 </header>
 
-<div class="search">
-<input type="text" onkeyup="search(this.value)" placeholder="Search products...">
+<!-- ADMIN PANEL -->
+<div id="adminPanel">
+  <h3>Add Product</h3>
+  <input id="pname" placeholder="Name"><br>
+  <input id="pprice" placeholder="Price"><br>
+  <input id="pimg" placeholder="Image URL"><br>
+  <button onclick="addProduct()">Add</button>
 </div>
 
-<div class="container" id="products"></div>
-
-<div class="cart">
-🛒 <span id="count">0</span>
-</div>
+<!-- PRODUCTS -->
+<div class="products" id="productList"></div>
 
 <script>
 
+let cart = [];
+let wishlist = [];
+
+/* DEFAULT PRODUCTS */
 let products = [
   {name:"Smart Watch", price:999, img:"https://picsum.photos/200?1"},
   {name:"Headphones", price:1299, img:"https://picsum.photos/200?2"},
-  {name:"Shoes", price:1999, img:"https://picsum.photos/200?3"},
-  {name:"Backpack", price:799, img:"https://picsum.photos/200?4"},
-  {name:"Phone Case", price:299, img:"https://picsum.photos/200?5"},
-  {name:"T-shirt", price:499, img:"https://picsum.photos/200?6"}
+  {name:"Mobile Phone", price:9999, img:"https://picsum.photos/200?3"}
 ];
 
-let cartCount = 0;
+/* SHOW PRODUCTS */
+function showProducts(){
+  let html = "";
 
-function show(data){
-  let box = document.getElementById("products");
-  box.innerHTML = "";
+  products.forEach((p,i)=>{
+    html += `
+    <div class="card">
+      <img src="${p.img}">
+      <h4>${p.name}</h4>
+      <p class="price">₹${p.price}</p>
 
-  data.forEach(p=>{
-    box.innerHTML += `
-      <div class="card">
-        <img src="${p.img}">
-        <h3>${p.name}</h3>
-        <p class="price">₹${p.price}</p>
-        <button onclick="add()">Add to Cart</button>
-      </div>
-    `;
+      <button onclick="addCart(${i})">Add to Cart</button>
+      <button onclick="addWish(${i})">❤️ Wishlist</button>
+    </div>`;
   });
+
+  document.getElementById("productList").innerHTML = html;
 }
 
-function add(){
-  cartCount++;
-  document.getElementById("count").innerText = cartCount;
+/* CART */
+function addCart(i){
+  cart.push(products[i]);
+  alert("Added to cart 🛒");
 }
 
-function search(val){
-  let filtered = products.filter(p =>
-    p.name.toLowerCase().includes(val.toLowerCase())
-  );
-  show(filtered);
+function viewCart(){
+  if(cart.length==0){
+    alert("Cart empty");
+    return;
+  }
+
+  let total = 0;
+  let msg = "🛒 CART\n\n";
+
+  cart.forEach((p,i)=>{
+    msg += (i+1)+". "+p.name+" - ₹"+p.price+"\n";
+    total += p.price;
+  });
+
+  msg += "\nTOTAL: ₹"+total;
+  alert(msg);
 }
 
-show(products);
+/* WISHLIST */
+function addWish(i){
+  wishlist.push(products[i].name);
+  alert("Added ❤️");
+}
+
+function viewWishlist(){
+  alert("❤️ Wishlist:\n\n"+wishlist.join("\n"));
+}
+
+/* SEARCH */
+function searchProduct(){
+  let val = document.getElementById("searchBox").value.toLowerCase();
+  let cards = document.getElementsByClassName("card");
+
+  for(let c of cards){
+    let name = c.getElementsByTagName("h4")[0].innerText.toLowerCase();
+    c.style.display = name.includes(val) ? "block" : "none";
+  }
+}
+
+/* ADMIN */
+function toggleAdmin(){
+  let a = document.getElementById("adminPanel");
+  a.style.display = (a.style.display=="block") ? "none" : "block";
+}
+
+function addProduct(){
+  let name = document.getElementById("pname").value;
+  let price = document.getElementById("pprice").value;
+  let img = document.getElementById("pimg").value;
+
+  products.push({name,price,img});
+  showProducts();
+
+  alert("Product added");
+}
+
+showProducts();
 
 </script>
 
